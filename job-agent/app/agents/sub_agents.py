@@ -1,0 +1,81 @@
+"""子 Agent 定义：供 Supervisor 调度，基于 LangChain 消息 + create_agent（LangGraph 状态图）。"""
+from __future__ import annotations
+
+import json
+
+from langchain_core.messages import HumanMessage, SystemMessage
+
+from app.agents.react_agent import ReActAgent
+from app.llm.factory import get_chat_model
+
+
+class SubAgent:
+    name: str
+    description: str
+
+    async def run(self, ctx: dict, **kwargs) -> dict:
+        raise NotImplementedError
+
+
+class RecommenderAgent(SubAgent):
+    name = "recommender"
+    description = "根据用户简历+画像，动态组合检索条件推荐岗位"
+
+    async def run(self, ctx: dict, **kwargs) -> dict:
+        agent = ReActAgent()
+        resume = kwargs.get("resume", {})
+        answer = await agent.run(
+            [
+                SystemMessage(content="你是岗位推荐专家，先用 get_user_resume 拿简历，再用 search_jobs 检索，给出 3-5 个推荐及理由。"),
+                HumanMessage(content=f"帮我推荐岗位。简历：{resume}"),
+            ],
+            tool_names=["get_user_resume", "search_jobs"],
+        )
+        return {"answer": answer}
+
+
+class ResumeOptimizerAgent(SubAgent):
+    name = "resume_optimizer"
+    description = "简历与岗位 JD 对比，输出优化建议"
+
+    async def run(self, ctx: dict, **kwargs) -> dict:
+        agent = ReActAgent()
+        job = kwargs.get("job", "")
+        resume = kwargs.get("resume", {})
+        answer = await agent.run(
+            [
+                SystemMessage(content="你是简历优化专家，对比简历与岗位 JD，指出差距并给出具体修改建议。"),
+                HumanMessage(content=f"岗位：{job}\n简历：{resume}"),
+            ],
+            tool_names=["get_user_resume"],
+        )
+        return {"answer": answer}
+
+
+class JobMatchAnalyzerAgent(SubAgent):
+    name = "job_match_analyzer"
+    description = "结合用户简历与岗位 JD，输出五部分人岗匹配综合分析"
+
+    async def run(self, ctx: dict, **kwargs) -> dict:
+        job_text = json.dumps(kwargs.get("job", {}), ensure_ascii=False, indent=2)
+        resume_text = json.dumps(kwargs.get("resume", {}), ensure_ascii=False, indent=2)
+        model = get_chat_model()
+        resp = await model.ainvoke([
+            SystemMessage(content=(
+                "你是资深求职顾问。请根据「岗位 JD」与「用户简历」做一份人岗匹配综合分析，"
+                "严格按以下五个部分输出，每部分用短标题加要点说明，语言务实、具体、可执行：\n"
+                "【匹配度评估】\n【你的优势】\n【差距与提升】\n【简历优化建议】\n【面试准备】"
+                "\n如果用户简历为空，明确这是岗位通用分析，无法评估个人匹配度或优势。"
+                "只根据岗位信息给出能力要求、准备方向、简历呈现建议和面试重点，不编造个人经历。"
+            )),
+            HumanMessage(content=f"岗位 JD：\n{job_text}\n\n用户简历：\n{resume_text}"),
+        ])
+        answer = resp.content if getattr(resp, "content", None) else ""
+        return {"answer": answer}
+
+
+SUB_AGENTS = {
+    RecommenderAgent.name: RecommenderAgent(),
+    ResumeOptimizerAgent.name: ResumeOptimizerAgent(),
+    JobMatchAnalyzerAgent.name: JobMatchAnalyzerAgent(),
+}

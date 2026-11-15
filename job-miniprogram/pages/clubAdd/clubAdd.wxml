@@ -1,0 +1,33 @@
+<view class="page">
+  <view class="nav">
+    <text class="nav-back" bindtap="goBack">‹</text>
+    <text class="nav-title">添加社团/组织经历</text>
+    <text class="nav-save" bindtap="save">保存</text>
+  </view>
+
+  <view class="form">
+    <view class="form-item">
+      <text class="label">社团/组织名称</text>
+      <input class="input" placeholder="请输入" value="{{form.name}}" data-key="name" bindinput="onInput" />
+    </view>
+    <view class="divider"></view>
+    <view class="form-item">
+      <text class="label">时间段</text>
+      <view class="date-row">
+        <picker mode="date" bindchange="onStartTime"><text class="value {{form.startTime ? '' : 'ph'}}">{{form.startTime || '开始时间'}}</text></picker>
+        <text class="sep">-</text>
+        <picker mode="date" bindchange="onEndTime"><text class="value {{form.endTime ? '' : 'ph'}}">{{form.endTime || '结束时间'}}</text></picker>
+      </view>
+    </view>
+    <view class="divider"></view>
+    <view class="form-item">
+      <text class="label">担任角色</text>
+      <input class="input" placeholder="请输入" value="{{form.role}}" data-key="role" bindinput="onInput" />
+    </view>
+    <view class="divider"></view>
+    <view class="form-item">
+      <text class="label">经历描述</text>
+      <textarea class="textarea" placeholder="请输入" value="{{form.description}}" data-key="description" bindinput="onInput" />
+    </view>
+  </view>
+</view>

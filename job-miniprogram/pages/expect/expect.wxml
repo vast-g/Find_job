@@ -1,0 +1,52 @@
+<view class="page">
+  <!-- 顶部导航 -->
+  <view class="nav">
+    <view class="nav-back" bindtap="goBack">‹</view>
+  </view>
+
+  <!-- 主标题区 -->
+  <view class="header">
+    <text class="main-title">新增求职期望</text>
+    <text class="sub-title">我们会据此展示职位，并将你推荐给BOSS</text>
+  </view>
+
+  <!-- 表单列表 -->
+  <view class="form-list">
+    <picker mode="selector" range="{{positionOptions}}" bindchange="onPositionChange">
+      <view class="form-item">
+        <text class="form-label">期望职位</text>
+        <text class="form-value {{expectPosition ? '' : 'placeholder'}}">{{expectPosition || '请选择期望职位'}}</text>
+        <text class="form-arrow">›</text>
+      </view>
+    </picker>
+    <view class="divider"></view>
+    <picker mode="selector" range="{{cityOptions}}" bindchange="onCityChange">
+      <view class="form-item">
+        <text class="form-label">工作城市</text>
+        <text class="form-value {{expectCity ? '' : 'placeholder'}}">{{expectCity || '请选择工作城市'}}</text>
+        <text class="form-arrow">›</text>
+      </view>
+    </picker>
+    <view class="divider"></view>
+    <picker mode="selector" range="{{salaryOptions}}" bindchange="onSalaryChange">
+      <view class="form-item">
+        <text class="form-label">薪资要求</text>
+        <text class="form-value {{expectSalary ? '' : 'placeholder'}}">{{expectSalary || '请选择薪资要求'}}</text>
+        <text class="form-arrow">›</text>
+      </view>
+    </picker>
+    <view class="divider"></view>
+    <picker mode="selector" range="{{industryOptions}}" bindchange="onIndustryChange">
+      <view class="form-item">
+        <text class="form-label">期望行业</text>
+        <text class="form-value">{{expectIndustry || '行业不限'}}</text>
+        <text class="form-arrow">›</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 底部保存按钮 -->
+  <view class="footer">
+    <button class="save-btn" bindtap="save">保存</button>
+  </view>
+</view>

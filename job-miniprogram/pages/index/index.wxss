@@ -1,0 +1,54 @@
+.page { padding-bottom: 20rpx; }
+.gold { color: #C9A45C; }
+.header { background: #0B2E59; padding: 24rpx 24rpx 30rpx; }
+.header-title { color: #fff; font-size: 40rpx; font-weight: 600; }
+.search-row { display: flex; align-items: center; gap: 16rpx; padding: 20rpx 24rpx 0; }
+.search-box { flex: 1; }
+.search-input { background: #fff; border-radius: 32rpx; padding: 16rpx 28rpx; font-size: 26rpx; }
+.filter-btn { position: relative; background: #0B2E59; color: #fff; border-radius: 32rpx; padding: 14rpx 24rpx; font-size: 26rpx; }
+.filter-dot { position: absolute; top: 6rpx; right: 8rpx; width: 12rpx; height: 12rpx; background: #C9A45C; border-radius: 50%; }
+.cate-bar { white-space: nowrap; padding: 16rpx 24rpx 0; }
+.cate-item { display: inline-block; padding: 10rpx 26rpx; margin-right: 14rpx; border-radius: 28rpx; background: #fff; font-size: 26rpx; }
+.cate-item.active { background: #0B2E59; color: #fff; }
+.active-filters { display: flex; align-items: center; gap: 12rpx; padding: 16rpx 24rpx 0; }
+.filter-tag { background: #E8EEF7; color: #0B2E59; font-size: 22rpx; border-radius: 22rpx; padding: 4rpx 18rpx; }
+.clear-filter { color: #999; font-size: 22rpx; }
+.stat-text { margin: 20rpx 24rpx 16rpx; font-size: 26rpx; }
+.stat-text .gold { font-weight: 700; }
+.data-row { display: flex; gap: 16rpx; padding: 0 24rpx; margin-bottom: 20rpx; }
+.data-card { flex: 1; text-align: center; padding: 24rpx 0; display: flex; flex-direction: column; }
+.data-num { font-size: 36rpx; font-weight: 700; }
+.data-label { color: #999; font-size: 22rpx; margin-top: 6rpx; }
+.tabs { display: flex; background: #fff; border-radius: 12px; padding: 8rpx; margin: 0 24rpx 20rpx; }
+.tab { flex: 1; text-align: center; padding: 14rpx 0; font-size: 28rpx; color: #666; border-radius: 8px; }
+.tab-active { background: #0B2E59; color: #fff; font-weight: 600; }
+.job-list { padding: 0 24rpx; }
+.job-card { padding: 24rpx; margin-bottom: 20rpx; }
+.job-top { display: flex; align-items: center; gap: 12rpx; margin-bottom: 12rpx; }
+.job-index { color: #999; font-size: 26rpx; width: 30rpx; }
+.job-name { flex: 1; font-weight: 600; font-size: 30rpx; }
+.ai-btn { background: #C9A45C; color: #fff; font-size: 20rpx; border-radius: 50%; width: 48rpx; height: 48rpx; display: flex; align-items: center; justify-content: center; }
+.arrow { color: #bbb; font-size: 40rpx; }
+.job-info { display: flex; align-items: center; gap: 16rpx; margin-bottom: 16rpx; }
+.job-salary { font-weight: 700; font-size: 28rpx; }
+.job-meta { color: #666; font-size: 24rpx; }
+.job-bottom { text-align: right; }
+.apply-btn { border: 2rpx solid #2E7D32; color: #2E7D32; background: #fff; border-radius: 28rpx; padding: 8rpx 28rpx; font-size: 24rpx; }
+.anno-list { padding: 0 24rpx; }
+.anno-card { padding: 24rpx; margin-bottom: 20rpx; display: flex; flex-direction: column; gap: 10rpx; }
+.anno-title { font-size: 28rpx; font-weight: 600; }
+.anno-time { color: #999; font-size: 22rpx; }
+.empty { text-align: center; color: #999; padding: 80rpx 0; }
+.mask { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; }
+.filter-panel { position: absolute; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24rpx 24rpx 0 0; padding: 30rpx 32rpx calc(30rpx + env(safe-area-inset-bottom)); }
+.panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20rpx; }
+.panel-title { font-size: 32rpx; font-weight: 600; }
+.panel-close { color: #999; font-size: 32rpx; }
+.filter-section { margin-bottom: 24rpx; }
+.section-title { font-size: 26rpx; color: #999; display: block; margin-bottom: 14rpx; }
+.option-row { display: flex; flex-wrap: wrap; gap: 16rpx; }
+.option { background: #F5F7FA; border-radius: 28rpx; padding: 10rpx 28rpx; font-size: 26rpx; color: #333; }
+.option.selected { background: #0B2E59; color: #fff; }
+.panel-btns { display: flex; gap: 20rpx; margin-top: 20rpx; }
+.reset-btn { flex: 1; background: #f0f0f0; color: #333; border: none; border-radius: 44rpx; }
+.confirm-btn { flex: 1; background: #0B2E59; color: #fff; border: none; border-radius: 44rpx; }

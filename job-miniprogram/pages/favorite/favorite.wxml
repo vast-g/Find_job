@@ -1,0 +1,7 @@
+<view class="page">
+  <view class="card" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}" bindtap="onJobTap">
+    <view class="title">{{item.title}}</view>
+    <view class="meta">{{item.companyName}} · {{item.city}}</view>
+  </view>
+  <view class="empty" wx:if="{{list.length === 0}}">暂无收藏</view>
+</view>

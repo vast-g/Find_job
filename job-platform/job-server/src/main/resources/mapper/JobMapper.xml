@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.JobMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into job (company_id, category_id, title, description, requirement, salary_min, salary_max,
+                         city, education, tags, status, view_count, apply_count, deadline, source_url, create_time, update_time, create_user, update_user)
+        values (#{companyId}, #{categoryId}, #{title}, #{description}, #{requirement}, #{salaryMin}, #{salaryMax},
+                #{city}, #{education}, #{tags}, #{status}, #{viewCount}, #{applyCount}, #{deadline}, #{sourceUrl}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
+    </insert>
+
+    <update id="update">
+        update job
+        <set>
+            <if test="companyId != null">company_id = #{companyId},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="requirement != null">requirement = #{requirement},</if>
+            <if test="salaryMin != null">salary_min = #{salaryMin},</if>
+            <if test="salaryMax != null">salary_max = #{salaryMax},</if>
+            <if test="city != null">city = #{city},</if>
+            <if test="education != null">education = #{education},</if>
+            <if test="tags != null">tags = #{tags},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="deadline != null">deadline = #{deadline},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateUser != null">update_user = #{updateUser}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="pageQuery" resultType="com.job.vo.JobVO">
+        select j.*, c.name companyName, k.name categoryName
+        from job j
+        left join company c on j.company_id = c.id
+        left join job_category k on j.category_id = k.id
+        <where>
+            <if test="title != null">and j.title like concat('%', #{title}, '%')</if>
+            <if test="categoryId != null">and j.category_id = #{categoryId}</if>
+            <if test="status != null">and j.status = #{status}</if>
+            <!-- 管理端同样修正：城市用模糊匹配，否则后台按 "北京" 也搜不到 "北京-海淀区" -->
+            <if test="city != null and city != ''">
+                and j.city like concat('%', #{city}, '%')
+            </if>
+            <if test="companyId != null">and j.company_id = #{companyId}</if>
+        </where>
+        order by j.create_time desc
+    </select>
+
+    <select id="listByCondition" resultType="com.job.vo.JobVO">
+        select j.*, c.name companyName, k.name categoryName
+        from job j
+        left join company c on j.company_id = c.id
+        left join job_category k on j.category_id = k.id
+        <where>
+            <if test="categoryId != null">and j.category_id = #{categoryId}</if>
+            <if test="status != null">and j.status = #{status}</if>
+            <!-- 城市用模糊匹配。库中城市格式并不统一：既有 "北京"、"上海"，
+                 也有 "北京-海淀区"、"深圳-罗湖区"、"广东"。
+                 原实现是 `city = #{city}` 精确匹配，导致搜 "北京" 查不到
+                 "北京-海淀区" 的岗位 —— 实测带区县的城市占 40%（255/624），
+                 这是"按城市搜岗位结果为空"的主因。 -->
+            <if test="city != null and city != ''">
+                and j.city like concat('%', #{city}, '%')
+            </if>
+            <!-- 学历同理：库中有 "本科"、"本科及以上"、"硕士"、"硕士及以上"，
+                 精确匹配会让 "本科" 搜不到 "本科及以上"。 -->
+            <if test="education != null and education != ''">
+                and j.education like concat('%', #{education}, '%')
+            </if>
+            <!-- 关键词跨字段匹配。原实现只搜 title，
+                 而大量岗位把技能要求写在 requirement/description 里：
+                 实测 "数据分析" 标题仅命中 2 条、职责描述却命中 63 条。
+                 只搜标题等于丢掉了绝大多数相关岗位。 -->
+            <if test="title != null and title != ''">
+                and (
+                    j.title like concat('%', #{title}, '%')
+                    or j.requirement like concat('%', #{title}, '%')
+                    or j.description like concat('%', #{title}, '%')
+                    or c.name like concat('%', #{title}, '%')
+                )
+            </if>
+        </where>
+        <!-- 相关度排序：标题命中优先，其次任职要求，再其次公司名，最后才是职责描述。
+             若只按 create_time 排序，"描述里偶然提到该词"的岗位会挤到最前面，
+             而真正对口的岗位被淹没。 -->
+        <choose>
+            <when test="title != null and title != ''">
+                order by
+                    case
+                        when j.title like concat('%', #{title}, '%') then 0
+                        when j.requirement like concat('%', #{title}, '%') then 1
+                        when c.name like concat('%', #{title}, '%') then 2
+                        else 3
+                    end,
+                    j.create_time desc
+            </when>
+            <otherwise>
+                order by j.create_time desc
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

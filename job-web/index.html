@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>国企/央企求职系统 · Web 管理控制台</title>
+<meta name="description" content="求职招聘系统 Web 管理控制台：数据概览、岗位/投递/企业管理、AI 智能问答与岗位要求分析、手动爬虫。">
+<!--
+  设计说明（为什么这么组织）：
+  1. 零外部依赖：本页不引用任何公共静态资源站 / 外部字体 / 外部图片。
+     部署机器外网不通，一旦引用站外资源就是整页白屏，所以样式与脚本全部本地化。
+  2. 零构建链：直接手写 HTML/CSS/JS，nginx 当作静态站点托管即可，不需要 npm/vite。
+  3. 脚本顺序有依赖：api.js（接口层）→ charts.js（图表）→ app.js（业务）。
+     用普通 <script> 而不是 ES Module，是为了连 file:// 直接打开也能跑。
+  4. 所有"数据块"都留了固定容器 + 加载/错误/空三种状态由 JS 填充，
+     所以后端全挂时页面依然有完整框架，不会白屏。
+-->
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<!-- ══════════════ 顶部栏 ══════════════
+     包含：标题、两个后端健康灯、接口地址、登录框 / 当前登录人 -->
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">求</span>
+    <div class="brand-text">
+      <h1>求职招聘系统 · Web 管理控制台</h1>
+      <p>Java 后端 :8080 · Python AI Agent :8000 · 微信小程序同源数据</p>
+    </div>
+  </div>
+
+  <div class="topbar-right">
+    <!-- 健康灯：Java 用 /user/stats 探；Agent 用 /admin/agent/history 探 -->
+    <div class="health-group">
+      <div class="health health-unknown" id="health-java" title="探测 /user/stats">
+        <span class="lamp"></span>
+        <div class="health-body">
+          <span class="health-label">Java 后端</span>
+          <span class="health-text">未探测</span>
+        </div>
+      </div>
+      <div class="health health-unknown" id="health-agent" title="探测 /admin/agent/history?sessionId=health">
+        <span class="lamp"></span>
+        <div class="health-body">
+          <span class="health-label">AI 历史接口</span>
+          <span class="health-text">未探测</span>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="btn-refresh-health" title="重新探测两个后端">刷新</button>
+    </div>
+
+    <!-- 接口地址：默认 /api（配合 nginx 反代）。后端没有 CORS，跨源直连会被浏览器拦截。 -->
+    <div class="api-base">
+      <label for="api-base">接口地址</label>
+      <input type="text" id="api-base" placeholder="/api（同源，留空=根路径）" spellcheck="false">
+      <button class="btn btn-ghost btn-sm" id="btn-api-base">应用</button>
+    </div>
+
+    <!-- 登录框：未登录显示表单，登录后显示当前登录人 -->
+    <form class="login-box" id="login-form" autocomplete="off">
+      <input type="text" id="login-user" placeholder="账号" spellcheck="false">
+      <input type="password" id="login-pass" placeholder="密码">
+      <button class="btn btn-primary btn-sm" id="btn-login" type="submit">登录</button>
+    </form>
+
+    <div class="login-who hidden" id="login-who">
+      <span class="who-avatar">管</span>
+      <div class="who-body">
+        <span class="who-label">当前登录人</span>
+        <span class="who-name" id="who-name">admin</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="btn-logout">退出</button>
+    </div>
+  </div>
+</header>
+
+<!-- 未登录提示条：避免用户点到表格才发现要登录 -->
+<div class="notice-bar hidden" id="login-tip">
+  登录一次即可使用岗位、投递、企业、公告、爬虫和 AI 助手。
+</div>
+
+<!-- ══════════════ 导航 ══════════════ -->
+<nav class="tabs">
+  <button class="tab active" data-view="overview">📊 数据概览</button>
+  <button class="tab" data-view="jobs">💼 岗位管理</button>
+  <button class="tab" data-view="applications">📮 投递记录</button>
+  <button class="tab" data-view="companies">🏢 企业管理</button>
+  <button class="tab" data-view="ai">🤖 AI 智能问答</button>
+  <button class="tab" data-view="system">⚙️ 系统与爬虫</button>
+</nav>
+
+<main class="main">
+
+  <!-- ══════════════ 视图 1：数据概览 ══════════════ -->
+  <section class="view active" data-view="overview">
+    <div class="section-head">
+      <h2>数据概览</h2>
+      <p>统计卡片来自 <code>GET /user/stats</code>（免鉴权）；三个图表用 <code>GET /user/job/list</code> 的全量结果就地计算，因此<b>未登录也能演示</b>。</p>
+    </div>
+
+    <div class="stat-cards" id="stat-cards"></div>
+
+    <div class="grid grid-2">
+      <div class="panel">
+        <div class="panel-head"><h3>岗位状态分布</h3><span class="panel-sub">环形图 · 手写 SVG</span></div>
+        <div class="panel-body chart-box" id="chart-job-status"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>城市岗位数 TOP8</h3><span class="panel-sub">横向条形图</span></div>
+        <div class="panel-body chart-box" id="chart-city"></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="panel">
+        <div class="panel-head"><h3>薪资区间分布</h3><span class="panel-sub">柱状图</span></div>
+        <div class="panel-body chart-box">
+          <div id="chart-salary"></div>
+          <div class="chart-note" id="chart-salary-note"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>最新岗位</h3><span class="panel-sub">按创建时间排序</span></div>
+        <div class="panel-body"><ul class="mini-list" id="latest-jobs"></ul></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>招聘公告</h3><span class="panel-sub">GET /admin/announcement/list（需登录）</span></div>
+      <div class="panel-body"><ul class="mini-list" id="announcement-list"></ul></div>
+    </div>
+  </section>
+
+  <!-- ══════════════ 视图 2：岗位管理 ══════════════ -->
+  <section class="view" data-view="jobs">
+    <div class="section-head">
+      <h2>岗位管理</h2>
+      <p><code>GET /admin/job/page</code> 分页查询，<code>POST /admin/job/status/{status}</code> 上架/下架。
+         搜索框会同时发送 <code>title</code> 与 <code>name</code> 两个参数（后端 DTO 实际只认 <code>title</code>）。</p>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="job-search" placeholder="按岗位名称模糊搜索…" spellcheck="false">
+      <select id="job-status-filter">
+        <option value="">全部状态</option>
+        <option value="1">在招</option>
+        <option value="0">已下架</option>
+        <option value="2">已结束</option>
+      </select>
+      <button class="btn btn-primary btn-sm" id="btn-job-search">搜索</button>
+      <button class="btn btn-ghost btn-sm" id="btn-job-reset">重置</button>
+      <button class="btn btn-ghost btn-sm" id="btn-job-refresh">刷新</button>
+    </div>
+
+    <div class="table-wrap" id="job-table-wrap"></div>
+    <div class="pagination" id="job-pagination"></div>
+  </section>
+
+  <!-- ══════════════ 视图 3：投递记录 ══════════════ -->
+  <section class="view" data-view="applications">
+    <div class="section-head">
+      <h2>投递记录</h2>
+      <p><code>GET /admin/application/page</code>。状态映射以 <code>sql/schema.sql</code> 的列注释为准：
+         1 已投递 / 2 已查看 / 3 面试邀请 / 4 已录用 / 5 已拒绝。</p>
+    </div>
+
+    <div class="toolbar">
+      <select id="app-status-filter">
+        <option value="">全部状态</option>
+        <option value="1">已投递</option>
+        <option value="2">已查看</option>
+        <option value="3">面试邀请</option>
+        <option value="4">已录用</option>
+        <option value="5">已拒绝</option>
+      </select>
+      <button class="btn btn-primary btn-sm" id="btn-app-search">筛选</button>
+      <button class="btn btn-ghost btn-sm" id="btn-app-reset">重置</button>
+    </div>
+
+    <div class="table-wrap" id="app-table-wrap"></div>
+    <div class="pagination" id="app-pagination"></div>
+  </section>
+
+  <!-- ══════════════ 视图 4：企业管理 ══════════════ -->
+  <section class="view" data-view="companies">
+    <div class="section-head">
+      <h2>企业管理</h2>
+      <p><code>GET /admin/company/page</code> 分页查询（模糊字段确实是 <code>name</code>，与岗位的 <code>title</code> 不同）。</p>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="company-search" placeholder="按企业名称模糊搜索…" spellcheck="false">
+      <button class="btn btn-primary btn-sm" id="btn-company-search">搜索</button>
+      <button class="btn btn-ghost btn-sm" id="btn-company-reset">重置</button>
+    </div>
+
+    <div class="table-wrap" id="company-table-wrap"></div>
+    <div class="pagination" id="company-pagination"></div>
+  </section>
+
+  <!-- ══════════════ 视图 5：AI 智能问答 ══════════════ -->
+  <section class="view" data-view="ai">
+    <div class="section-head">
+      <h2>AI 智能问答</h2>
+      <p><code>POST /admin/agent/chat</code> → Java 转发给 Python Agent（ReAct + RAG）。
+         <b>实测 20~120 秒</b>，所以发送后会有"正在分析"的秒表与阶段提示。
+         登录管理员账号后即可使用，业务与助手共用该登录。</p>
+    </div>
+
+    <div class="grid grid-ai">
+      <!-- 对话区 -->
+      <div class="panel panel-chat">
+        <div class="panel-head">
+          <h3>对话</h3>
+          <div class="panel-head-right">
+            <span class="panel-sub">会话 sessionId：<code id="chat-session">（尚未创建）</code></span>
+            <button class="btn btn-ghost btn-sm" id="btn-chat-clear">新会话</button>
+          </div>
+        </div>
+
+        <div class="chat-log" id="chat-log"></div>
+
+        <div class="quick-qs">
+          <span class="muted">试试：</span>
+          <button class="quick-q">帮我推荐几个国企岗位</button>
+          <button class="quick-q">央国企面试一般有哪些环节？</button>
+          <button class="quick-q">简历里的项目经历应该怎么写？</button>
+        </div>
+
+        <div class="composer">
+          <textarea id="chat-input" rows="2" placeholder="输入你的问题…（Enter 发送，Shift+Enter 换行）"></textarea>
+          <button class="btn btn-primary" id="btn-chat-send">发送</button>
+        </div>
+      </div>
+
+      <!-- 右侧：凭证 + 耗时趋势 + 岗位分析 -->
+      <div class="ai-side">
+        <div class="panel">
+          <div class="panel-head"><h3>登录状态</h3></div>
+          <div class="panel-body"><p class="tip" id="ai-login-status">请在顶部登录一次，即可使用业务与 AI 助手</p></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>AI 调用耗时</h3><span class="panel-sub">折线图</span></div>
+          <div class="panel-body chart-box" id="chart-latency"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>岗位 AI 分析</h3><span class="panel-sub">POST /admin/agent/analyze</span></div>
+          <div class="panel-body">
+            <p class="tip">从「岗位管理」列表点 <b>AI 分析</b> 直接分析该岗位；也可以在这里手动输入岗位 ID。
+               管理员分析无需个人简历，提供岗位要求与准备建议；候选人的个人匹配分析请在用户端进行。</p>
+            <form class="inline-form" id="analyze-job-id-form">
+              <input type="text" id="analyze-job-id" placeholder="岗位 ID（如 1）" spellcheck="false">
+              <button class="btn btn-primary btn-sm" type="submit">开始分析</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 五部分分析结果 -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>岗位要求分析</h3>
+        <span class="panel-sub">岗位要求 / 核心技能 / 任职条件 / 准备建议 / 面试准备</span>
+      </div>
+      <div class="panel-body">
+        <div id="analyze-head"></div>
+        <div id="analyze-body"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ 视图 6：系统与爬虫 ══════════════ -->
+  <section class="view" data-view="system">
+    <div class="section-head">
+      <h2>系统与爬虫</h2>
+      <p>手动触发一次抓取，以及一键自检所有接口的连通性。</p>
+    </div>
+
+    <div class="panel panel-crawl">
+      <div class="panel-head">
+        <h3>手动爬虫</h3>
+        <span class="panel-sub">POST /admin/crawl/run · 实测 1~3 分钟，超时上限 5 分钟</span>
+      </div>
+      <div class="panel-body">
+        <div class="crawl-row">
+          <div class="crawl-status" id="crawl-status"></div>
+          <button class="btn btn-primary" id="btn-crawl">手动触发爬取</button>
+        </div>
+        <div class="progress hidden" id="crawl-progress"><div class="progress-bar"></div></div>
+        <div class="crawl-hint" id="crawl-hint"></div>
+        <ul class="log-list" id="crawl-log"></ul>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="panel">
+        <div class="panel-head"><h3>企业总数</h3><span class="panel-sub">GET /admin/company/list</span></div>
+        <div class="panel-body" id="system-company-count"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>岗位分类</h3><span class="panel-sub">GET /admin/category/list</span></div>
+        <div class="panel-body" id="category-list"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>接口自检</h3>
+        <div class="panel-head-right">
+          <span class="panel-sub">逐个真实请求，失败会给出排查建议</span>
+          <button class="btn btn-primary btn-sm" id="btn-diag">开始自检</button>
+        </div>
+      </div>
+      <div class="panel-body" id="diag-table">
+        <div class="state state-empty"><div class="state-title">点击「开始自检」逐个探测接口连通性</div>
+          <div class="state-detail">使用当前管理员登录验证接口；未登录的管理端检查会跳过，不会切换账号或触发爬虫。</div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>公告列表</h3><span class="panel-sub">GET /admin/announcement/list</span></div>
+      <div class="panel-body"><ul class="mini-list" id="system-announcement-list"></ul></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <span>零依赖 · 零构建 · 原生 HTML/CSS/JS + 手写 SVG 图表</span>
+  <span class="muted">接口前缀可在右上角修改；后端未配置 CORS，浏览器直连 :8080 会被拦截，请通过 nginx 同源代理访问。</span>
+</footer>
+
+<div class="toast-root" id="toast-root"></div>
+
+<noscript>
+  <div class="notice-bar">本控制台需要启用 JavaScript 才能工作。</div>
+</noscript>
+
+<!-- 顺序不能换：api.js 提供 Api，charts.js 提供 Charts，app.js 依赖前两者 -->
+<script src="js/api.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

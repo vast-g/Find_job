@@ -1,0 +1,177 @@
+<view class="page">
+  <!-- 顶部导航 -->
+  <view class="nav">
+    <view class="nav-back" bindtap="goBack">‹</view>
+    <text class="nav-title">我的在线简历</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <!-- 基本信息 -->
+  <view class="card basic-card" data-card="basic" bindtap="openEdit">
+    <view class="card-head">
+      <view class="avatar">🧑</view>
+      <view class="basic-info">
+        <view class="basic-name">
+          <text class="name">{{resume && resume.name ? resume.name : '未填写姓名'}}</text>
+          <text class="tag">学生</text>
+        </view>
+        <text class="basic-meta">{{resume && resume.age ? resume.age + '岁' : '年龄待完善'}} · {{resume && resume.education ? resume.education : '学历待完善'}}</text>
+      </view>
+      <text class="edit-icon">✎</text>
+    </view>
+  </view>
+
+  <!-- 个人优势 -->
+  <view class="card" data-card="summary" bindtap="openEdit">
+    <view class="card-title-row">
+      <text class="card-title">个人优势</text>
+      <text class="edit-icon">✎</text>
+    </view>
+    <text class="card-content">{{resume && resume.summary ? resume.summary : '请添加个人优势'}}</text>
+  </view>
+
+  <!-- 求职状态 -->
+  <view class="card">
+    <picker mode="selector" range="{{jobStatusOptions}}" bindchange="onJobStatusChange">
+      <view class="card-title-row">
+        <text class="card-title">求职状态</text>
+        <text class="picker-value">{{jobStatusIndex >= 0 ? jobStatusOptions[jobStatusIndex] : '请选择'}}</text>
+        <text class="edit-icon">›</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 求职期望 -->
+  <view class="card" bindtap="goExpect">
+    <view class="card-title-row">
+      <text class="card-title">求职期望</text>
+      <text class="help-icon">?</text>
+      <text class="edit-icon">＋</text>
+    </view>
+    <text class="card-content">{{resume && resume.expectPosition ? resume.expectPosition + ' ' + (resume.expectSalary || '') : '请添加求职期望'}}</text>
+    <text class="card-sub">{{resume && resume.expectCity ? resume.expectCity : ''}} | {{resume && resume.expectIndustry ? resume.expectIndustry : ''}}</text>
+  </view>
+
+  <!-- 工作/实习经历 -->
+  <view class="card">
+    <view class="card-title-row">
+      <text class="card-title">工作/实习经历</text>
+      <text class="edit-icon" data-type="work" catchtap="addEntry">＋</text>
+    </view>
+    <view class="entry-block" wx:for="{{workDisplayList}}" wx:key="index">
+      <text class="entry-text">{{item}}</text>
+      <view class="entry-ops">
+        <text class="entry-op" data-type="work" data-index="{{index}}" catchtap="editEntry">编辑</text>
+        <text class="entry-op del" data-type="work" data-index="{{index}}" catchtap="deleteEntry">删除</text>
+      </view>
+    </view>
+    <text class="card-content" wx:if="{{workList.length === 0}}">暂无工作/实习经历</text>
+  </view>
+
+  <!-- 项目经历 -->
+  <view class="card">
+    <view class="card-title-row">
+      <text class="card-title">项目经历</text>
+      <text class="edit-icon" data-type="project" catchtap="addEntry">＋</text>
+    </view>
+    <view class="entry-block" wx:for="{{projectDisplayList}}" wx:key="index">
+      <text class="entry-text">{{item}}</text>
+      <view class="entry-ops">
+        <text class="entry-op" data-type="project" data-index="{{index}}" catchtap="editEntry">编辑</text>
+        <text class="entry-op del" data-type="project" data-index="{{index}}" catchtap="deleteEntry">删除</text>
+      </view>
+    </view>
+    <text class="card-content" wx:if="{{projectList.length === 0}}">暂无项目经历</text>
+  </view>
+
+  <!-- 教育经历 -->
+  <view class="card" data-card="education" bindtap="openEdit">
+    <view class="card-title-row">
+      <text class="card-title">教育经历</text>
+      <text class="edit-icon">＋</text>
+    </view>
+    <view class="edu-row">
+      <view class="edu-logo">🎓</view>
+      <view class="edu-info">
+        <text class="edu-school">{{resume && resume.school ? resume.school : '未填写学校'}}</text>
+        <text class="edu-meta">{{resume && resume.major ? resume.major : '专业待完善'}} · {{resume && resume.education ? resume.education : ''}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 社团/组织经历 -->
+  <view class="card">
+    <view class="card-title-row">
+      <text class="card-title">社团/组织经历</text>
+      <text class="edit-icon" data-type="club" catchtap="addEntry">＋</text>
+    </view>
+    <view class="entry-block" wx:for="{{clubDisplayList}}" wx:key="index">
+      <text class="entry-text">{{item}}</text>
+      <view class="entry-ops">
+        <text class="entry-op" data-type="club" data-index="{{index}}" catchtap="editEntry">编辑</text>
+        <text class="entry-op del" data-type="club" data-index="{{index}}" catchtap="deleteEntry">删除</text>
+      </view>
+    </view>
+    <text class="card-content" wx:if="{{clubList.length === 0}}">暂无</text>
+  </view>
+
+  <!-- 所获荣誉 -->
+  <view class="card">
+    <view class="card-title-row">
+      <text class="card-title">所获荣誉</text>
+      <text class="edit-icon" data-type="honor" catchtap="addEntry">＋</text>
+    </view>
+    <view class="entry-block" wx:for="{{honorDisplayList}}" wx:key="index">
+      <text class="entry-text">{{item}}</text>
+      <view class="entry-ops">
+        <text class="entry-op" data-type="honor" data-index="{{index}}" catchtap="editEntry">编辑</text>
+        <text class="entry-op del" data-type="honor" data-index="{{index}}" catchtap="deleteEntry">删除</text>
+      </view>
+    </view>
+    <text class="card-content" wx:if="{{honorList.length === 0}}">暂无</text>
+  </view>
+
+  <!-- 资格证书 -->
+  <view class="card">
+    <view class="card-title-row">
+      <text class="card-title">资格证书</text>
+      <text class="edit-icon" data-type="cert" catchtap="addEntry">＋</text>
+    </view>
+    <view class="entry-block" wx:for="{{certDisplayList}}" wx:key="index">
+      <text class="entry-text">{{item}}</text>
+      <view class="entry-ops">
+        <text class="entry-op" data-type="cert" data-index="{{index}}" catchtap="editEntry">编辑</text>
+        <text class="entry-op del" data-type="cert" data-index="{{index}}" catchtap="deleteEntry">删除</text>
+      </view>
+    </view>
+    <text class="card-content" wx:if="{{certList.length === 0}}">暂无</text>
+  </view>
+
+  <!-- 经历编辑弹窗 -->
+  <view class="mask" wx:if="{{showEntry}}">
+    <view class="dialog">
+      <view class="dialog-title">{{entryType === 'work' ? '工作/实习经历' : '项目经历'}}</view>
+      <textarea class="field-textarea" value="{{entryText}}" bindinput="onEntryInput" placeholder="请填写经历内容" />
+      <view class="dialog-btns">
+        <button class="cancel-btn" size="mini" bindtap="closeEntry">取消</button>
+        <button class="save-btn" size="mini" bindtap="saveEntry">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 编辑弹窗 -->
+  <view class="mask" wx:if="{{showEdit}}">
+    <view class="dialog">
+      <view class="dialog-title">{{editTitle}}</view>
+      <view class="dialog-field" wx:for="{{fields}}" wx:key="key">
+        <text class="field-label">{{item.label}}</text>
+        <textarea wx:if="{{item.textarea}}" class="field-textarea" value="{{form[item.key]}}" data-key="{{item.key}}" bindinput="onInput" />
+        <input wx:else class="field-input" value="{{form[item.key]}}" data-key="{{item.key}}" bindinput="onInput" />
+      </view>
+      <view class="dialog-btns">
+        <button class="cancel-btn" size="mini" bindtap="closeEdit">取消</button>
+        <button class="save-btn" size="mini" bindtap="save">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

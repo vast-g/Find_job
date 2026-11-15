@@ -1,0 +1,21 @@
+<view class="page" wx:if="{{job}}">
+  <view class="card">
+    <view class="title">{{job.title}}</view>
+    <view class="salary">{{job.salaryText}}</view>
+    <view class="meta">{{job.companyName}} · {{job.city}} · {{job.education}}</view>
+    <view class="tags"><text class="tag" wx:for="{{job.tags}}" wx:key="*this">{{item}}</text></view>
+  </view>
+  <view class="card">
+    <view class="sec-title">岗位描述</view>
+    <view class="content">{{job.description}}</view>
+  </view>
+  <view class="card">
+    <view class="sec-title">任职要求</view>
+    <view class="content">{{job.requirement}}</view>
+  </view>
+  <view class="footer">
+    <button class="btn" bindtap="onFavorite">收藏</button>
+    <button class="btn primary" bindtap="onApply">{{isExternal ? '前往官网投递' : '提交投递'}}</button>
+  </view>
+  <view class="external-note" wx:if="{{isExternal}}">该岗位由官网接收申请，外部投递不会自动记录在本页</view>
+</view>

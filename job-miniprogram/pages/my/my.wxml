@@ -1,0 +1,54 @@
+<view class="page">
+  <!-- 顶部导航 -->
+  <view class="nav">个人中心</view>
+
+  <!-- 深蓝个人卡片 -->
+  <view class="profile-card">
+    <view class="user-row">
+      <view class="avatar">🤖</view>
+      <view class="user-info">
+        <text class="user-name">{{userInfo ? (userInfo.name || '微信用户') : '未登录'}}</text>
+        <text class="login-hint">{{userInfo ? '已登录' : '登录后可投递/收藏/简历'}}</text>
+      </view>
+      <button class="auth-btn" size="mini" bindtap="onAuth" disabled="{{authBusy}}" loading="{{authBusy}}">{{authBusy ? '登录中' : (userInfo ? '退出' : '登录')}}</button>
+    </view>
+    <text class="rights">开通会员享受专属权益：精准匹配/微信推送/佣金提现</text>
+  </view>
+
+  <!-- 校招进度 -->
+  <view class="card progress-card">
+    <text class="progress-title">校招进度</text>
+    <view class="timeline">
+      <view class="stage" wx:for="{{stages}}" wx:key="name">
+        <view class="stage-left">
+          <view class="stage-dot {{index === currentIndex ? 'current' : ''}}"></view>
+          <view class="stage-line" wx:if="{{index < stages.length - 1}}"></view>
+        </view>
+        <view class="stage-info">
+          <text class="stage-name {{index === currentIndex ? 'current-text' : ''}}">{{item.name}}</text>
+          <text class="stage-time">{{item.time}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="stage-detail" wx:if="{{stages[currentIndex]}}">
+      <text class="detail-title">{{stages[currentIndex].name}}（{{stages[currentIndex].time}}）</text>
+      <text class="detail-p">{{stages[currentIndex].description}}</text>
+    </view>
+  </view>
+
+  <!-- 服务地址：开发工具默认本机，真机使用电脑局域网地址。 -->
+  <view class="card progress-card">
+    <text class="progress-title">服务地址</text>
+    <input value="{{serverUrl}}" bindinput="onServerInput" placeholder="https://你的服务域名" maxlength="200" />
+    <text class="stage-time">真机调试请与电脑连接同一 Wi-Fi，电脑地址变更后在这里更新。</text>
+    <button size="mini" bindtap="onServerSave">保存地址</button>
+  </view>
+
+  <!-- 常用功能 -->
+  <view class="grid">
+    <view class="grid-item" wx:for="{{functions}}" wx:key="name" data-f="{{item.name}}" bindtap="onFunc">
+      <text class="grid-icon">{{item.icon}}</text>
+      <text class="grid-label">{{item.name}}</text>
+    </view>
+  </view>
+</view>

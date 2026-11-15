@@ -1,0 +1,563 @@
+[
+  {
+    "id": 301,
+    "category": "岗位推荐",
+    "question": "我是计算机硕士，简历里有SQL和Python，想找北京国企的数据分析岗",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定北京",
+        "岗位方向为数据分析/数据挖掘类",
+        "企业性质为国企或央企",
+        "结合简历中的SQL、Python技能给出匹配理由"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 1,
+    "success_criteria": "推荐岗位需同时满足北京、国企/央企、数据分析方向三个条件，并至少给出1条与简历SQL/Python技能对应的匹配理由。"
+  },
+  {
+    "id": 302,
+    "category": "岗位推荐",
+    "question": "帮我找北京的国企人工智能岗，我想做大模型相关的算法工作",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定北京",
+        "方向为人工智能/大模型/机器学习",
+        "国企或央企平台（含研究院、科技子公司）",
+        "结合PyTorch、LangChain等技能说明匹配点",
+        "说明岗位对模型落地经验的要求"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 3,
+    "success_criteria": "推荐中至少包含1个北京国企/央企的人工智能或大模型方向岗位，并说明与用户PyTorch、LangChain经历的匹配关系。"
+  },
+  {
+    "id": 303,
+    "category": "岗位推荐",
+    "question": "帮我推荐北京的国企通信技术岗",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定北京",
+        "方向为通信工程/网络技术",
+        "国企或央企性质（如运营商、通信类央企）"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 1,
+    "success_criteria": "推荐岗位需全部位于北京且为国企/央企的通信技术类岗位，并说明岗位职责或技术要求。"
+  },
+  {
+    "id": 304,
+    "category": "岗位推荐",
+    "question": "我是计算机专业硕士，想从技术转国企的产品经理岗，北京有合适的吗",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定北京",
+        "方向为产品经理/产品规划",
+        "国企或央企性质",
+        "说明技术背景转产品岗的匹配点与需补强项"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 3,
+    "success_criteria": "推荐中至少包含1个北京国企/央企的产品经理类岗位，并说明技术背景转产品岗的匹配点与短板。"
+  },
+  {
+    "id": 305,
+    "category": "岗位推荐",
+    "question": "帮我推荐深圳的国企算法岗，我是明年毕业的计算机硕士",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定深圳",
+        "方向为算法/机器学习",
+        "国企或央企性质",
+        "匹配应届硕士身份"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 1,
+    "success_criteria": "推荐岗位需同时满足深圳、国企/央企、算法方向，并说明是否接受应届硕士投递。"
+  },
+  {
+    "id": 306,
+    "category": "岗位推荐",
+    "question": "帮我找深圳国企的数据分析岗，我的期望薪资是15-25K",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定深圳",
+        "方向为数据分析类",
+        "国企或央企性质",
+        "说明岗位薪资与15-25K期望的匹配或差距"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 2,
+    "success_criteria": "推荐岗位需位于深圳、国企/央企、数据分析方向，并说明薪资与15-25K期望的匹配情况。"
+  },
+  {
+    "id": 307,
+    "category": "岗位推荐",
+    "question": "深圳有没有面向计算机硕士的央企管培生项目",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定深圳",
+        "管培生/管理培训生项目",
+        "央企或国企性质",
+        "说明轮岗与培养机制"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 3,
+    "success_criteria": "推荐中至少包含1个深圳央企/国企的管培生类项目，并说明其培养或轮岗安排。"
+  },
+  {
+    "id": 308,
+    "category": "岗位推荐",
+    "question": "我是北邮计算机硕士，想去上海做国企的数据分析，有岗位吗",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定上海",
+        "方向为数据分析/数据挖掘",
+        "国企或央企性质",
+        "结合硕士学历与SQL等技能说明匹配点",
+        "岗位数量有限时如实说明可选范围"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 3,
+    "success_criteria": "推荐岗位需全部位于上海且为国企/央企的数据分析类岗位；若可选数量有限应如实说明范围，不得夸大或编造。"
+  },
+  {
+    "id": 309,
+    "category": "岗位推荐",
+    "question": "帮我找成都的国企数据分析岗",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定成都",
+        "方向为数据分析类",
+        "国企或央企性质"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 1,
+    "success_criteria": "至少给出1个成都地区的国企数据分析类岗位，并说明其岗位职责或技能要求。"
+  },
+  {
+    "id": 310,
+    "category": "岗位推荐",
+    "question": "帮我推荐武汉的国企算法工程师岗位",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定武汉",
+        "方向为算法/机器学习",
+        "国企或央企性质",
+        "岗位数量较少时如实说明"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 2,
+    "success_criteria": "推荐岗位需位于武汉且为国企/央企的算法类岗位；若数量较少应如实说明可选范围。"
+  },
+  {
+    "id": 311,
+    "category": "岗位推荐",
+    "question": "帮我找南京的国企通信网络技术岗",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定南京",
+        "方向为通信/网络技术",
+        "国企或央企性质"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 1,
+    "success_criteria": "至少给出1个南京地区国企/央企的通信网络技术类岗位，并说明其技术要求。"
+  },
+  {
+    "id": 312,
+    "category": "岗位推荐",
+    "question": "郑州有没有国企的算法岗？我是计算机硕士，想回河南发展",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定郑州",
+        "方向为算法/人工智能",
+        "国企或央企性质",
+        "如实说明可选岗位数量"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 2,
+    "success_criteria": "推荐岗位需位于郑州且为国企/央企的算法类岗位，并如实说明可选岗位的稀缺程度。"
+  },
+  {
+    "id": 313,
+    "category": "岗位推荐",
+    "question": "帮我推荐合肥的国企算法岗",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定合肥",
+        "方向为算法/人工智能",
+        "国企或央企性质",
+        "库中无匹配时应如实说明而非编造岗位"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 3,
+    "success_criteria": "若岗位库中无合肥的国企算法类岗位，应如实告知无匹配，不得编造岗位；可建议相近城市或相邻方向。"
+  },
+  {
+    "id": 314,
+    "category": "岗位推荐",
+    "question": "帮我找青岛的国企数据分析岗",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定青岛",
+        "方向为数据分析类",
+        "国企或央企性质",
+        "无匹配时如实说明"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 2,
+    "success_criteria": "若岗位库中无青岛的国企数据分析类岗位，应如实告知无匹配，不得编造岗位或模糊化处理。"
+  },
+  {
+    "id": 315,
+    "category": "岗位推荐",
+    "question": "我是计算机硕士，想找厦门的国企软件开发岗",
+    "expected_intent": "recommend",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "地域限定厦门",
+        "方向为软件开发/研发",
+        "国企或央企性质",
+        "无匹配时如实说明并给出替代建议"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 2,
+    "success_criteria": "若岗位库中无厦门的国企软件开发类岗位，应如实说明无匹配情况，不得虚构岗位；可建议周边城市或相关方向。"
+  },
+  {
+    "id": 316,
+    "category": "简历优化",
+    "question": "我的技能栏写了Python、PyTorch、LangChain、Docker、Redis，投国企算法岗怎么改才能匹配JD关键词",
+    "expected_intent": "resume_opt",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs",
+      "search_knowledge"
+    ],
+    "ground_truth_docs": [
+      "doc_resume_tips"
+    ],
+    "expected": {
+      "关键点": [
+        "从目标国企算法岗JD中提取技术关键词并对齐",
+        "按熟练度分级呈现技能而非堆砌",
+        "技能需与项目或实习经历相互印证",
+        "删除无法自证的技能项"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 1,
+    "success_criteria": "回答需给出与国企算法岗JD对齐的技能栏改写示例，并说明按熟练度分级与去重自证的原则。"
+  },
+  {
+    "id": 317,
+    "category": "简历优化",
+    "question": "我有中国电信的算法实习和字节跳动的后端实习，简历里这两段该怎么取舍和排序",
+    "expected_intent": "resume_opt",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "按目标岗位（国企算法岗）相关性排序而非单纯按时间排序",
+        "算法实习优先，后端实习保留可迁移的工程能力",
+        "两段实习均需补充量化产出",
+        "压缩与目标岗位无关的细节"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 2,
+    "success_criteria": "必须明确给出两段实习的排序结论（哪段在前、为什么），并说明与国企算法岗相关性的取舍依据。"
+  },
+  {
+    "id": 318,
+    "category": "简历优化",
+    "question": "我是应届生，简历上的「应届生身份」和「到岗时间」该怎么写",
+    "expected_intent": "resume_opt",
+    "golden_tools": [
+      "get_user_resume",
+      "search_knowledge"
+    ],
+    "ground_truth_docs": [
+      "doc_timeline"
+    ],
+    "expected": {
+      "关键点": [
+        "明确标注应届生身份与预计毕业时间",
+        "到岗时间写具体（如一个月内到岗）而非含糊表述",
+        "与国企校招时间线（秋招/春招节点）衔接",
+        "不写「随时到岗」这类无法兑现的表述"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 1,
+    "success_criteria": "回答需给出应届生身份与到岗时间在简历中的具体写法示例，并说明与国企校招节奏的衔接。"
+  },
+  {
+    "id": 319,
+    "category": "简历优化",
+    "question": "我简历写了两页，国企是不是更看重一页纸，该怎么压到一页",
+    "expected_intent": "resume_opt",
+    "golden_tools": [
+      "get_user_resume",
+      "search_knowledge"
+    ],
+    "ground_truth_docs": [
+      "doc_resume_tips"
+    ],
+    "expected": {
+      "关键点": [
+        "明确一页纸是应届生简历的核心原则",
+        "删除与目标岗位无关的内容",
+        "压缩空泛的自我评价段落",
+        "保留量化成果与关键技术栈"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 1,
+    "success_criteria": "明确给出一页纸原则的判断，并针对该简历给出至少2条具体的删减方向。"
+  },
+  {
+    "id": 320,
+    "category": "简历优化",
+    "question": "我的两个项目「智能求职助手」和「中文长文本摘要模型微调」写得太笼统，帮我改成量化成果",
+    "expected_intent": "resume_opt",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "用STAR结构重构项目描述",
+        "补充可量化指标（准确率/性能/数据规模）",
+        "写清个人承担的具体工作与角色",
+        "说明技术选型理由"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 2,
+    "success_criteria": "至少改写1条项目经历，改写后必须包含具体数字或可验证的成果指标。"
+  },
+  {
+    "id": 321,
+    "category": "简历优化",
+    "question": "帮我针对国家电网的算法岗定制一版简历，需要突出什么",
+    "expected_intent": "resume_opt",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs",
+      "search_knowledge"
+    ],
+    "ground_truth_docs": [
+      "doc_soe_private"
+    ],
+    "expected": {
+      "关键点": [
+        "对齐国家电网算法岗JD的关键词与电力业务场景",
+        "突出国企央企看重的稳定性、政治面貌与在校表现",
+        "调整实习与项目的呈现顺序",
+        "淡化互联网风格的夸张表述"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 3,
+    "success_criteria": "给出针对国家电网算法岗的定制方案，至少包含3处相对通用版简历的具体调整。"
+  },
+  {
+    "id": 322,
+    "category": "简历优化",
+    "question": "帮我针对中国移动的算法岗定制简历，我的实习经历偏互联网",
+    "expected_intent": "resume_opt",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs",
+      "search_knowledge"
+    ],
+    "ground_truth_docs": [
+      "doc_soe_private"
+    ],
+    "expected": {
+      "关键点": [
+        "对齐中国移动算法岗JD关键词",
+        "把互联网实习经历翻译成运营商业务价值",
+        "突出与通信/大数据场景相关的项目",
+        "控制篇幅并突出量化结果"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 3,
+    "success_criteria": "给出针对中国移动算法岗的定制方案，至少包含2处把互联网经历改写为运营商场景价值的具体调整。"
+  },
+  {
+    "id": 323,
+    "category": "简历优化",
+    "question": "我的期望薪资是15-25K，简历里要不要写期望薪资，怎么写更稳妥",
+    "expected_intent": "resume_opt",
+    "golden_tools": [
+      "get_user_resume",
+      "search_knowledge"
+    ],
+    "ground_truth_docs": [
+      "doc_salary_negotiation"
+    ],
+    "expected": {
+      "关键点": [
+        "说明简历中写期望薪资的利弊与适用场景",
+        "给出与国企薪酬体系（总包/绩效/补贴）匹配的表述方式",
+        "期望区间写法与岗位定级的关系",
+        "不建议写虚高或完全模糊的数字"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 2,
+    "success_criteria": "明确给出「简历中是否写期望薪资」的结论及理由，并给出1条可直接使用的表述示例。"
+  },
+  {
+    "id": 324,
+    "category": "简历优化",
+    "question": "我的实习一段偏算法一段偏后端，简历上怎么写才不会让人觉得职业方向不清晰",
+    "expected_intent": "resume_opt",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs"
+    ],
+    "ground_truth_docs": [],
+    "expected": {
+      "关键点": [
+        "提炼两段经历共同的算法与工程能力主线",
+        "围绕目标岗位重组经历描述顺序",
+        "弱化与目标方向无关的细节",
+        "避免简历中出现方向互斥的求职意向"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 3,
+    "success_criteria": "给出消除「方向不清晰」观感的具体写法，至少包含1条可执行的经历改写示例。"
+  },
+  {
+    "id": 325,
+    "category": "简历优化",
+    "question": "我做的「面向国企招聘的智能求职助手」项目，简历里怎么写才能匹配国企算法岗",
+    "expected_intent": "resume_opt",
+    "golden_tools": [
+      "get_user_resume",
+      "search_jobs"
+    ],
+    "ground_truth_docs": [
+      "doc_resume_tips"
+    ],
+    "expected": {
+      "关键点": [
+        "提炼项目中与目标岗位JD对应的技术栈（LangChain、检索、模型微调）",
+        "量化项目效果（准确率/效率提升）",
+        "呼应国企招聘业务场景",
+        "写清个人贡献而非团队成果"
+      ]
+    },
+    "adversarial": 0,
+    "difficulty": 2,
+    "success_criteria": "至少给出1版改写后的项目描述，且同时包含技术栈关键词与可量化结果。"
+  }
+]

@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "求职系统 Find_job 架构",
+    "output": "求职系统架构图.html",
+    "quality_profile": "showcase",
+    "viewBox": [1720, 740],
+    "views": [
+      {
+        "id": "c-end-path",
+        "label": "C 端主链路",
+        "focus": ["miniprogram", "java", "agent", "llm"],
+        "note": "小程序请求经 Java 后端转发到 Python Agent，再由大模型产出问答与岗位分析。"
+      },
+      {
+        "id": "ai-and-retrieval",
+        "label": "AI 与检索",
+        "focus": ["agent", "ollama", "rag", "mysql-agent"],
+        "note": "Agent 用 Ollama 向量化，混合检索本地 RAG 语料，并把会话与画像落到 job_agent 库。"
+      },
+      {
+        "id": "admin-and-crawl",
+        "label": "管理端与抓取",
+        "focus": ["admin-web", "java", "job-sources", "mysql-platform"],
+        "note": "管理端走 token 通道维护企业与岗位，Java 定时从招聘平台抓取岗位并去重回填。"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "admin-web",
+      "type": "external",
+      "label": "管理端",
+      "sublabel": "员工 / 企业 / 岗位维护",
+      "pos": [60, 140],
+      "size": [150, 60]
+    },
+    {
+      "id": "wechat",
+      "type": "external",
+      "label": "微信登录服务",
+      "sublabel": "code 换 openid",
+      "pos": [400, 140],
+      "size": [160, 60]
+    },
+    {
+      "id": "llm",
+      "type": "external",
+      "label": "百炼大模型",
+      "sublabel": "DeepSeek-v4.1-flash",
+      "pos": [1180, 140],
+      "size": [150, 64]
+    },
+    {
+      "id": "miniprogram",
+      "type": "frontend",
+      "label": "微信小程序",
+      "sublabel": "C 端 · 12 个页面",
+      "pos": [60, 360],
+      "size": [140, 64]
+    },
+    {
+      "id": "java",
+      "type": "backend",
+      "label": "Java 业务后端",
+      "sublabel": "Spring Boot 2.7.3 · :8080",
+      "tag": "管理端 / 用户端双通道",
+      "pos": [400, 360],
+      "size": [170, 88]
+    },
+    {
+      "id": "agent",
+      "type": "backend",
+      "label": "Python AI Agent",
+      "sublabel": "FastAPI · :8000",
+      "tag": "八层管线 + ReAct",
+      "pos": [790, 360],
+      "size": [170, 88]
+    },
+    {
+      "id": "job-sources",
+      "type": "external",
+      "label": "招聘数据源",
+      "sublabel": "国家大学生就业平台 / 国聘",
+      "pos": [60, 620],
+      "size": [160, 60]
+    },
+    {
+      "id": "mysql-platform",
+      "type": "database",
+      "label": "MySQL job_platform",
+      "sublabel": "业务库 · 10 张表",
+      "pos": [400, 620],
+      "size": [170, 60]
+    },
+    {
+      "id": "mysql-agent",
+      "type": "database",
+      "label": "MySQL job_agent",
+      "sublabel": "记忆与轨迹 · 6 张表",
+      "pos": [790, 620],
+      "size": [170, 60]
+    },
+    {
+      "id": "ollama",
+      "type": "external",
+      "label": "Ollama",
+      "sublabel": "qwen3-embedding:4b",
+      "pos": [1180, 620],
+      "size": [150, 60]
+    },
+    {
+      "id": "rag",
+      "type": "database",
+      "label": "RAG 语料",
+      "sublabel": "knowledge.jsonl + FAISS",
+      "pos": [1520, 620],
+      "size": [150, 60]
+    }
+  ],
+  "connections": [
+    {
+      "id": "miniprogram-to-java",
+      "from": "miniprogram",
+      "to": "java",
+      "label": "HTTPS · /user/**",
+      "labelDy": 26,
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "admin-to-java",
+      "from": "admin-web",
+      "to": "java",
+      "label": "token · /admin/**",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "java-to-agent",
+      "from": "java",
+      "to": "agent",
+      "label": "POST /agent/**",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "agent-to-llm",
+      "from": "agent",
+      "to": "llm",
+      "label": "LLM 调用",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "bottom"
+    },
+    {
+      "id": "java-to-wechat",
+      "from": "java",
+      "to": "wechat",
+      "label": "code 换 openid",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "java-to-mysql-platform",
+      "from": "java",
+      "to": "mysql-platform",
+      "label": "MyBatis",
+      "labelDx": 20,
+      "labelDy": 28,
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "java-to-sources",
+      "from": "java",
+      "to": "job-sources",
+      "label": "定时抓取岗位",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "agent-to-mysql-agent",
+      "from": "agent",
+      "to": "mysql-agent",
+      "label": "SQLAlchemy",
+      "labelDx": -24,
+      "labelDy": 28,
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "agent-to-ollama",
+      "from": "agent",
+      "to": "ollama",
+      "label": "向量化",
+      "variant": "dashed",
+      "fromSide": "right",
+      "toSide": "top"
+    },
+    {
+      "id": "agent-to-rag",
+      "from": "agent",
+      "to": "rag",
+      "label": "混合检索",
+      "labelDx": 50,
+      "fromSide": "bottom",
+      "toSide": "top"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "C 端入口",
+      "items": [
+        "微信小程序 12 个页面，baseUrl 指向 localhost:8080",
+        "岗位卡片「AI」按钮触发 /user/agent/analyze"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "双后端协作",
+      "items": [
+        "Java 17 + Spring Boot 2.7.3，管理端与用户端双通道",
+        "Java 经 AgentClientUtil 调用 Python，超时 180s"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "AI 管线",
+      "items": [
+        "意图识别 3 类 → ReAct 5 工具（≤10 步 / 120s）",
+        "RAG：query rewrite → BM25 + FAISS → RRF → rerank"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "数据与鉴权",
+      "items": [
+        "job_platform 10 张表，job_agent 6 张表",
+        "JWT HS256 密钥 itcast，管理端 token / 用户端 authentication"
+      ]
+    }
+  ]
+}

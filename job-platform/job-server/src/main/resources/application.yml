@@ -1,0 +1,82 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+  datasource:
+    druid:
+      driver-class-name: ${job.datasource.driver-class-name}
+      url: jdbc:mysql://${job.datasource.host}:${job.datasource.port}/${job.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${job.datasource.username}
+      password: ${job.datasource.password}
+  redis:
+    host: ${job.redis.host}
+    port: ${job.redis.port}
+  cache:
+    type: redis
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.job.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com:
+      job:
+        mapper: debug
+        service: info
+        controller: info
+
+job:
+  jwt:
+    admin-secret-key: itcast
+    admin-ttl: 7200000000
+    admin-token-name: token
+    user-secret-key: itcast
+    user-ttl: 7200000000
+    user-token-name: authentication
+
+  alioss:
+    endpoint: ${job.alioss.endpoint}
+    access-key-id: ${job.alioss.access-key-id}
+    access-key-secret: ${job.alioss.access-key-secret}
+    bucket-name: ${job.alioss.bucket-name}
+
+  wechat:
+    appid: ${job.wechat.appid}
+    secret: ${job.wechat.secret}
+
+  agent:
+    base-url: ${job.agent.base-url}
+
+  crawl:
+    enabled: true
+    cron: "0 0 6 * * ?"
+    sources:
+      - url: "https://job.ncss.cn/student/jobs/jobslist/ajax/?jobType=&areaCode=&jobName=&monthPay=&industrySectors=&property=&categoryCode=&memberLevel=&recruitType=&offset=1&limit=10&keyUnits=&degreeCode=&sourcesName=0&sourcesType="
+        method: GET
+        referer: "https://job.ncss.cn/student/jobs/index.html"
+        property-list: "国有企业,事业单位,央企"
+        company-type-filter: "国有,央企,事业"
+        page-size: 10
+        max-pages: 10
+        job-url-template: "https://job.ncss.cn/student/jobs/{jobId}/detail.html"
+      - url: "https://gp-api.iguopin.com/api/jobs/v1/recom-job"
+        method: POST
+        body: '{"search":{"page":1,"page_size":20,"nature":["115xW5oQ"]},"recom":{"update_time":true,"company_nature":true,"hot_job":true}}'
+        referer: "https://www.iguopin.com/"
+        origin: "https://www.iguopin.com"
+        device: pc
+        subsite: iguopin
+        page-size: 20
+        max-pages: 5
+        job-url-template: "https://www.iguopin.com/job/detail?id={jobId}"

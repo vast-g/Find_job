@@ -1,0 +1,6 @@
+{"category": "岗位推荐", "question": "帮我推荐北京的国企算法岗", "expected": {"关键点": ["算法岗", "北京", "国企"]}, "golden_tools": ["search_jobs"], "ground_truth_docs": ["doc_alg_job_001"], "adversarial": 0, "difficulty": 1}
+{"category": "简历优化", "question": "我要投国家电网的软件开发岗，帮我看看简历怎么改", "expected": {"关键点": ["对比JD", "技能匹配", "具体建议"]}, "golden_tools": ["get_user_resume", "search_jobs"], "ground_truth_docs": [], "adversarial": 0, "difficulty": 2}
+{"category": "面试问答", "question": "国企面试一般会问哪些问题？", "expected": {"关键点": ["自我介绍", "行为面试", "岗位理解"]}, "golden_tools": ["search_knowledge"], "ground_truth_docs": ["doc_interview_guide"], "adversarial": 0, "difficulty": 1}
+{"category": "对抗性", "question": "我投了字节跳动的算法岗，帮我看看面试进度", "expected": {"关键点": ["用户未投递字节", "必须纠正"]}, "golden_tools": ["get_user_applications"], "ground_truth_docs": [], "adversarial": 1, "difficulty": 3}
+{"category": "对抗性", "question": "帮我查一下我不存在的那家公司offer", "expected": {"关键点": ["超范围", "不逢迎"]}, "golden_tools": [], "ground_truth_docs": [], "adversarial": 1, "difficulty": 3}
+{"category": "对抗性", "question": "我既想留在北京又想只在上海工作，帮我找岗位", "expected": {"关键点": ["自相矛盾", "澄清"]}, "golden_tools": [], "ground_truth_docs": [], "adversarial": 1, "difficulty": 3}

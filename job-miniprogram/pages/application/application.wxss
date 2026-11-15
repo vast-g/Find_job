@@ -1,0 +1,28 @@
+.page { padding-bottom: 20rpx; }
+.nav { background: #0B2E59; display: flex; align-items: center; justify-content: center; padding: 20rpx 24rpx; position: relative; }
+.nav-title { color: #fff; font-size: 34rpx; font-weight: 600; }
+.pc-btn { position: absolute; right: 24rpx; color: #C9A45C; font-size: 24rpx; display: flex; align-items: center; gap: 6rpx; }
+.hero { background: #0B2E59; padding: 24rpx 30rpx 40rpx; position: relative; }
+.hero-title { color: #fff; font-size: 34rpx; font-weight: 600; display: block; }
+.hero-sub { color: rgba(255,255,255,0.7); font-size: 24rpx; margin-top: 10rpx; display: block; }
+.hero-icon { position: absolute; right: 30rpx; top: 50%; transform: translateY(-50%); font-size: 40rpx; }
+.stat-row { display: flex; gap: 16rpx; padding: 20rpx; margin-top: -20rpx; position: relative; }
+.stat-card { flex: 1; text-align: center; padding: 28rpx 0; display: flex; flex-direction: column; }
+.stat-num { font-size: 40rpx; font-weight: 700; }
+.stat-label { color: #999; font-size: 22rpx; margin-top: 6rpx; }
+.tip-card { margin: 0 20rpx 20rpx; padding: 24rpx; display: flex; justify-content: space-between; align-items: center; }
+.tip-title { font-weight: 600; font-size: 28rpx; display: block; }
+.tip-sub { color: #999; font-size: 22rpx; margin-top: 6rpx; display: block; }
+.tip-link { color: #C9A45C; font-size: 24rpx; white-space: nowrap; }
+.tabs { white-space: nowrap; padding: 0 20rpx 20rpx; }
+.tab { display: inline-block; padding: 12rpx 24rpx; margin-right: 14rpx; background: #fff; border-radius: 28rpx; font-size: 24rpx; color: #666; }
+.tab-active { background: #0B2E59; color: #fff; }
+.list { padding: 0 20rpx; }
+.item { padding: 24rpx; margin-bottom: 20rpx; display: flex; flex-direction: column; gap: 8rpx; }
+.item-title { font-size: 30rpx; font-weight: 600; }
+.item-meta { color: #888; font-size: 24rpx; }
+.item-status { color: #C9A45C; font-size: 24rpx; }
+.empty { text-align: center; padding: 100rpx 0; display: flex; flex-direction: column; align-items: center; }
+.empty-icon { font-size: 100rpx; color: #ddd; }
+.empty-title { color: #999; font-size: 30rpx; margin-top: 24rpx; }
+.empty-sub { color: #ccc; font-size: 24rpx; margin-top: 10rpx; }

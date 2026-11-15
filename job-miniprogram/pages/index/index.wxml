@@ -1,0 +1,102 @@
+<view class="page">
+  <!-- 顶部深蓝导航区 -->
+  <view class="header">
+    <text class="header-title">精准匹配</text>
+  </view>
+
+  <!-- 搜索 + 筛选 -->
+  <view class="search-row">
+    <view class="search-box">
+      <input class="search-input" placeholder="搜索岗位 / 公司" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" confirm-type="search" />
+    </view>
+    <view class="filter-btn" bindtap="toggleFilter">
+      <text>筛选</text>
+      <text class="filter-dot" wx:if="{{education || city}}"></text>
+    </view>
+  </view>
+
+  <!-- 分类横向滚动 -->
+  <scroll-view class="cate-bar" scroll-x>
+    <view class="cate-item {{!categoryId ? 'active' : ''}}" data-id="0" bindtap="onCategoryTap">全部</view>
+    <view class="cate-item {{categoryId == item.id ? 'active' : ''}}" wx:for="{{categories}}" wx:key="id" data-id="{{item.id}}" bindtap="onCategoryTap">{{item.name}}</view>
+  </scroll-view>
+
+  <!-- 已选筛选条件 -->
+  <view class="active-filters" wx:if="{{education || city}}">
+    <view class="filter-tag" wx:if="{{education}}">{{education}}</view>
+    <view class="filter-tag" wx:if="{{city}}">{{city}}</view>
+    <text class="clear-filter" bindtap="resetFilter">清除</text>
+  </view>
+
+  <!-- 统计 -->
+  <view class="stat-text">已筛选出 <text class="gold">{{jobs.length}}</text> 个匹配岗位</view>
+
+  <!-- 数据卡片 -->
+  <view class="data-row">
+    <view class="card data-card" wx:for="{{stats}}" wx:key="label">
+      <text class="data-num gold">{{item.num}}</text>
+      <text class="data-label">{{item.label}}</text>
+    </view>
+  </view>
+
+  <!-- 标签页 -->
+  <view class="tabs">
+    <view class="tab {{tab === 0 ? 'tab-active' : ''}}" data-tab="0" bindtap="switchTab">匹配岗位</view>
+    <view class="tab {{tab === 1 ? 'tab-active' : ''}}" data-tab="1" bindtap="switchTab">招聘公告</view>
+  </view>
+
+  <!-- 岗位列表 -->
+  <view class="job-list" wx:if="{{tab === 0}}">
+    <view class="card job-card" wx:for="{{jobs}}" wx:key="id" data-id="{{item.id}}" bindtap="onJobTap">
+      <view class="job-top">
+        <text class="job-index">{{index + 1}}</text>
+        <text class="job-name">{{item.title}}</text>
+        <text class="ai-btn" data-id="{{item.id}}" catchtap="onAi">AI</text>
+        <text class="arrow">›</text>
+      </view>
+      <view class="job-info">
+        <text class="job-salary gold">{{item.salaryText}}</text>
+        <text class="job-meta">{{item.companyName}} · {{item.city}} · {{item.education}}</text>
+      </view>
+      <view class="job-bottom">
+        <text class="apply-btn" data-id="{{item.id}}" catchtap="onApply">查看投递方式</text>
+      </view>
+    </view>
+    <view class="empty" wx:if="{{!loading && jobs.length === 0}}">暂无匹配岗位</view>
+  </view>
+
+  <!-- 招聘公告 -->
+  <view class="anno-list" wx:else>
+    <view class="card anno-card" wx:for="{{announcements}}" wx:key="id" data-id="{{item.id}}" bindtap="onAnnoTap">
+      <text class="anno-title">{{item.title}}</text>
+      <text class="anno-time">{{item.publishTime}}</text>
+    </view>
+    <view class="empty" wx:if="{{announcements.length === 0}}">暂无招聘公告</view>
+  </view>
+
+  <!-- 筛选面板 -->
+  <view class="mask" wx:if="{{showFilter}}" bindtap="toggleFilter">
+    <view class="filter-panel" catchtap="">
+      <view class="panel-head">
+        <text class="panel-title">筛选</text>
+        <text class="panel-close" bindtap="toggleFilter">✕</text>
+      </view>
+      <view class="filter-section">
+        <text class="section-title">学历</text>
+        <view class="option-row">
+          <view class="option {{educationIndex === index ? 'selected' : ''}}" wx:for="{{educationOptions}}" wx:key="*this" data-index="{{index}}" bindtap="onEducationTap">{{item}}</view>
+        </view>
+      </view>
+      <view class="filter-section">
+        <text class="section-title">地点</text>
+        <view class="option-row">
+          <view class="option {{cityIndex === index ? 'selected' : ''}}" wx:for="{{cityOptions}}" wx:key="*this" data-index="{{index}}" bindtap="onCityTap">{{item}}</view>
+        </view>
+      </view>
+      <view class="panel-btns">
+        <button class="reset-btn" bindtap="resetFilter">重置</button>
+        <button class="confirm-btn" bindtap="applyFilter">确定</button>
+      </view>
+    </view>
+  </view>
+</view>

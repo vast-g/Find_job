@@ -1,0 +1,59 @@
+<view class="page">
+  <!-- 顶部导航 -->
+  <view class="nav">
+    <text class="nav-back" bindtap="goBack">‹</text>
+    <text class="nav-title">添加工作经历</text>
+    <text class="nav-save" bindtap="save">保存</text>
+  </view>
+
+  <!-- 表单 -->
+  <view class="form">
+    <view class="form-item">
+      <text class="label">公司名称</text>
+      <input class="input" placeholder="请输入" value="{{form.company}}" data-key="company" bindinput="onInput" />
+    </view>
+    <view class="divider"></view>
+    <view class="form-item">
+      <text class="label">所在行业</text>
+      <picker mode="selector" range="{{industryOptions}}" bindchange="onIndustryChange">
+        <view class="picker-wrap">
+          <text class="value {{form.industry ? '' : 'ph'}}">{{form.industry || '请选择'}}</text>
+          <text class="arrow">›</text>
+        </view>
+      </picker>
+    </view>
+    <view class="divider"></view>
+    <view class="form-item">
+      <text class="label">在职时间</text>
+      <view class="date-row">
+        <picker mode="date" bindchange="onStartTime"><text class="value {{form.startTime ? '' : 'ph'}}">{{form.startTime || '入职时间'}}</text></picker>
+        <text class="sep">-</text>
+        <picker mode="date" bindchange="onEndTime"><text class="value {{form.endTime ? '' : 'ph'}}">{{form.endTime || '结束时间'}}</text></picker>
+      </view>
+    </view>
+    <view class="divider"></view>
+    <view class="form-item">
+      <text class="label">职位名称</text>
+      <input class="input" placeholder="请输入" value="{{form.position}}" data-key="position" bindinput="onInput" />
+    </view>
+    <view class="divider"></view>
+    <view class="form-item">
+      <text class="label">工作内容</text>
+      <textarea class="textarea" placeholder="请输入" value="{{form.content}}" data-key="content" bindinput="onInput" />
+    </view>
+  </view>
+
+  <text class="opt-hint">以下为选填项</text>
+
+  <view class="form">
+    <view class="form-item">
+      <text class="label">工作业绩</text>
+      <input class="input" placeholder="选填 请输入" value="{{form.achievement}}" data-key="achievement" bindinput="onInput" />
+    </view>
+    <view class="divider"></view>
+    <view class="form-item">
+      <text class="label">所属部门</text>
+      <input class="input" placeholder="选填 请输入" value="{{form.department}}" data-key="department" bindinput="onInput" />
+    </view>
+  </view>
+</view>

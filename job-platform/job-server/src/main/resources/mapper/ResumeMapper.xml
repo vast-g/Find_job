@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.ResumeMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into resume (user_id, name, education, school, major, experience, skills, summary, age, education_experience, project_experience, campus_experience, job_status, expect_position, expect_city, expect_salary, expect_industry, club_experience, honors, certificates, is_default, create_time, update_time)
+        values (#{userId}, #{name}, #{education}, #{school}, #{major}, #{experience}, #{skills}, #{summary}, #{age}, #{educationExperience}, #{projectExperience}, #{campusExperience}, #{jobStatus}, #{expectPosition}, #{expectCity}, #{expectSalary}, #{expectIndustry}, #{clubExperience}, #{honors}, #{certificates}, #{isDefault}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="update">
+        update resume
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="education != null">education = #{education},</if>
+            <if test="school != null">school = #{school},</if>
+            <if test="major != null">major = #{major},</if>
+            <if test="experience != null">experience = #{experience},</if>
+            <if test="skills != null">skills = #{skills},</if>
+            <if test="summary != null">summary = #{summary},</if>
+            <if test="age != null">age = #{age},</if>
+            <if test="educationExperience != null">education_experience = #{educationExperience},</if>
+            <if test="projectExperience != null">project_experience = #{projectExperience},</if>
+            <if test="campusExperience != null">campus_experience = #{campusExperience},</if>
+            <if test="jobStatus != null">job_status = #{jobStatus},</if>
+            <if test="expectPosition != null">expect_position = #{expectPosition},</if>
+            <if test="expectCity != null">expect_city = #{expectCity},</if>
+            <if test="expectSalary != null">expect_salary = #{expectSalary},</if>
+            <if test="expectIndustry != null">expect_industry = #{expectIndustry},</if>
+            <if test="clubExperience != null">club_experience = #{clubExperience},</if>
+            <if test="honors != null">honors = #{honors},</if>
+            <if test="certificates != null">certificates = #{certificates},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

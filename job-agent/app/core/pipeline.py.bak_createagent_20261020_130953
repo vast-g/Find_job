@@ -1,0 +1,149 @@
+"""顶层 Agent 执行管线（基于 LangChain/LangGraph）。
+
+意图识别 -> 编排 -> 执行(create_react_agent / Workflow) -> 记忆写入 -> 返回
+"""
+from __future__ import annotations
+
+import time
+import uuid
+
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.agents.react_agent import ReActAgent
+from app.core.context import reset_current_user, set_current_user
+from app.core.intent import recognize_intent
+from app.core.orchestrator import route
+from app.core.stats import RunStats
+from app.core.termination import TerminationChecker
+from app.db.repositories import ProfileRepository
+from app.memory.factory import get_memory_store
+from app.memory.short_term import RedisChatMessageHistory
+from app.memory.summarizer import maybe_summarize
+from app.observability.callback import ObservabilityCallbackHandler
+from app.observability.tracer import Tracer
+
+REACT_TOOLS = {
+    "recommend": ["get_user_resume", "search_jobs"],
+    "resume_opt": ["get_user_resume", "search_jobs", "search_knowledge"],
+    # 修复（由评测发现）：get_user_applications 已注册工具集，但原先不在任何意图的
+    # 白名单里 —— 意味着「帮我看看投递进度」这类问题 Agent 永远无法查投递记录。
+    # 该工具本就是为 qa 场景设计的（投递进度/状态查询），故补入 qa 白名单。
+    # 这是一条真实的配置缺陷，已被评测集的对抗用例暴露。
+    "qa": ["search_knowledge", "get_user_applications"],
+}
+
+SYSTEM_PROMPTS = {
+    "recommend": "你是国企/央企求职助手，负责岗位推荐。先获取简历，再检索岗位，给出针对性推荐和理由。",
+    "resume_opt": "你是简历优化专家，对比用户简历与目标岗位要求，给出可执行的修改建议。",
+    "qa": "你是求职顾问，基于检索到的知识回答面试技巧/行业/备考/流程问题，不编造。",
+}
+
+
+def _format_profile(profile) -> str | None:
+    """把长期画像拼成可读中文，供系统提示注入。"""
+    if profile is None:
+        return None
+    parts = []
+    if getattr(profile, "goals", None):
+        parts.append(f"求职目标：{profile.goals}")
+    if getattr(profile, "preferences", None):
+        parts.append(f"偏好：{profile.preferences}")
+    if getattr(profile, "skills", None):
+        parts.append(f"技能：{'、'.join(profile.skills)}")
+    if getattr(profile, "resume_summary", None):
+        parts.append(f"简历要点：{profile.resume_summary}")
+    if getattr(profile, "cross_session_summary", None):
+        parts.append(f"历史会话摘要：{profile.cross_session_summary}")
+    return "\n".join(parts) if parts else None
+
+
+class AgentPipeline:
+    def __init__(self, session: AsyncSession):
+        self.session = session
+        # 短期记忆后端由 MEMORY_BACKEND 决定：redis（生产）| memory（评测/容器）
+        # 原来是硬编码 RedisMessageStore(get_redis())，使 Redis 成为硬依赖，
+        # 导致本机未装 Redis 时连评测都无法启动。
+        self.msg_store = get_memory_store()
+        self.profile_repo = ProfileRepository(session)
+        self.request_id = uuid.uuid4().hex[:16]
+        self.stats = RunStats()
+        self._start = time.perf_counter()
+
+    async def handle(self, user_id: int, message: str, session_id: str | None = None) -> dict:
+        session_id = session_id or uuid.uuid4().hex[:16]
+        tracer = Tracer(self.session, self.request_id, session_id, user_id)
+        history_store = RedisChatMessageHistory(session_id, user_id, self.msg_store)
+
+        # 1. 短期记忆载入（最近 N 轮）
+        history: list[BaseMessage] = await history_store.aget_messages()
+
+        # 2. 意图识别
+        # 必须把最近几轮历史一起送进去：否则像「那上海的呢？」这类**指代式追问**
+        # 在路由层完全"看不见"上下文 —— 模型只能看到一个没头没尾的短句，
+        # 极易判成 qa，从而走错工具白名单。
+        # （recognize_intent 本就支持 history 参数，之前只是调用时漏传了。）
+        recent = [
+            str(m.content) for m in history[-6:]
+            if getattr(m, "content", None)
+        ]
+        async with tracer.step("intent", input_data=message):
+            intent = await recognize_intent(message, history=recent)
+        intent_name = intent.get("intent", "qa")
+
+        # 3. 编排路由
+        decision = route(intent_name)
+
+        # 4. 执行（当前均为 ReAct），注入长期画像
+        profile = await self.profile_repo.get(user_id)
+        answer = await self._run_react(intent_name, message, history, session_id, user_id, profile, tracer)
+
+        # 5. 记忆写入
+        await history_store.aadd_messages([HumanMessage(content=message), AIMessage(content=answer)])
+        await maybe_summarize(session_id, user_id, self.msg_store, self.profile_repo)
+
+        await self.session.commit()
+        return self._result(session_id, answer, decision.mode, intent_name)
+
+    # ---- 内部 ----
+    async def _run_react(self, intent: str, message: str, history: list[BaseMessage], session_id: str, user_id: int, profile=None, tracer=None) -> str:
+        system = SYSTEM_PROMPTS.get(intent, SYSTEM_PROMPTS["qa"])
+        profile_text = _format_profile(profile)
+        if profile_text:
+            system += "\n\n【用户长期画像（跨会话记忆）】\n" + profile_text
+        msgs = [SystemMessage(content=system)]
+        msgs.extend(history)
+        msgs.append(HumanMessage(content=message))
+
+        checker = TerminationChecker()
+        callback = ObservabilityCallbackHandler(self.stats, self.session, self.request_id, session_id, user_id)
+        # 承接 Tracer 已用掉的 step 序号，避免两条链路都从 1 开始导致 step 冲突
+        callback._step = getattr(tracer, "_step", 0)
+
+        # 把"当前用户"放进请求上下文，供 get_user_resume 等工具自行取用。
+        # 否则工具要求显式传 user_id，而模型无从得知，只能反问用户要 ID。
+        token = set_current_user(user_id)
+        try:
+            return await ReActAgent().run(
+                msgs,
+                tool_names=REACT_TOOLS.get(intent, ["search_knowledge"]),
+                checker=checker,
+                stats=self.stats,
+                callback=callback,
+            )
+        finally:
+            reset_current_user(token)
+            # trace 走内存缓冲 + 独立会话落库：回调在 ORM flush 过程中触发时
+            # 直接写库会抛 'Session is already flushing'，导致工具痕迹丢失。
+            await callback.aflush()
+
+    def _result(self, session_id: str, reply: str, source: str, intent: str | None) -> dict:
+        return {
+            "session_id": session_id,
+            "request_id": self.request_id,
+            "reply": reply,
+            "source": source,
+            "intent": intent,
+            "latency_ms": int((time.perf_counter() - self._start) * 1000),
+            "stats": self.stats.as_dict(),
+        }

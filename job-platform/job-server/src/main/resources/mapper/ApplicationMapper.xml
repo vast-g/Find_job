@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.ApplicationMapper">
+
+    <update id="update">
+        update application
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="interviewTime != null">interview_time = #{interviewTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="pageQuery" resultType="com.job.vo.ApplicationVO">
+        select a.id, a.user_id, u.name userName, a.job_id, j.title jobTitle, j.company_id, c.name companyName,
+               a.resume_id, r.name resumeName, a.status, a.interview_time interviewTime, a.remark, a.create_time createTime
+        from application a
+        join user u on a.user_id = u.id
+        join job j on a.job_id = j.id
+        join company c on j.company_id = c.id
+        join resume r on a.resume_id = r.id
+        <where>
+            <if test="jobId != null">and a.job_id = #{jobId}</if>
+            <if test="status != null">and a.status = #{status}</if>
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <select id="listByUserId" resultType="com.job.vo.ApplicationVO">
+        select a.id, a.job_id, j.title jobTitle, j.company_id, c.name companyName,
+               a.resume_id, r.name resumeName, a.status, a.interview_time interviewTime, a.remark, a.create_time createTime
+        from application a
+        join job j on a.job_id = j.id
+        join company c on j.company_id = c.id
+        join resume r on a.resume_id = r.id
+        where a.user_id = #{userId}
+        order by a.create_time desc
+    </select>
+</mapper>

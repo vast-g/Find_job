@@ -1,0 +1,21 @@
+﻿job:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: localhost
+    port: 3306
+    database: job_platform
+    username: root
+    password: PASSWORD_在这里填写
+  redis:
+    host: localhost
+    port: 6379
+  alioss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    access-key-id: ACCESS_KEY_ID_在这里填写
+    access-key-secret: ACCESS_KEY_SECRET_在这里填写
+    bucket-name: java-ai-200512
+  wechat:
+    appid: wxce1bf6c826a534e3
+    secret: SECRET_在这里填写
+  agent:
+    base-url: http://localhost:8000

@@ -1,0 +1,18 @@
+.page { background: #fff; min-height: 100vh; }
+.nav { display: flex; align-items: center; padding: 20rpx 24rpx; }
+.nav-back { font-size: 44rpx; color: #333; width: 60rpx; }
+.nav-title { flex: 1; text-align: center; font-size: 34rpx; font-weight: 600; color: #333; }
+.nav-save { color: #0B2E59; font-size: 30rpx; }
+.form { padding: 0 32rpx; }
+.form-item { display: flex; align-items: center; min-height: 100rpx; }
+.label { width: 170rpx; font-size: 30rpx; color: #333; }
+.input { flex: 1; font-size: 30rpx; }
+.textarea { flex: 1; font-size: 30rpx; min-height: 140rpx; padding: 20rpx 0; }
+.picker-wrap { flex: 1; display: flex; align-items: center; justify-content: space-between; }
+.value { font-size: 30rpx; color: #333; }
+.value.ph { color: #999; }
+.arrow { color: #C0C4CC; font-size: 36rpx; }
+.date-row { flex: 1; display: flex; align-items: center; gap: 12rpx; }
+.sep { color: #999; }
+.divider { height: 1rpx; background: #F0F0F0; }
+.opt-hint { color: #999; font-size: 24rpx; padding: 30rpx 32rpx 10rpx; display: block; }

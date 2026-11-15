@@ -1,0 +1,11 @@
+.page { padding: 20rpx; padding-bottom: 140rpx; }
+.card { background: #fff; border-radius: 12rpx; padding: 24rpx; margin-bottom: 20rpx; }
+.title { font-size: 36rpx; font-weight: bold; color: #333; }
+.salary { color: #e53e3e; font-size: 32rpx; margin: 16rpx 0; }
+.meta { color: #888; font-size: 26rpx; margin-bottom: 12rpx; }
+.tags .tag { display: inline-block; background: #eef4fb; color: #2b6cb0; font-size: 22rpx; padding: 4rpx 14rpx; border-radius: 6rpx; margin-right: 10rpx; }
+.sec-title { font-size: 30rpx; font-weight: bold; color: #333; margin-bottom: 12rpx; }
+.content { color: #666; font-size: 28rpx; line-height: 1.6; }
+.footer { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #fff; padding: 16rpx 20rpx; }
+.btn { flex: 1; margin: 0 10rpx; }
+.btn.primary { background: #2b6cb0; color: #fff; }

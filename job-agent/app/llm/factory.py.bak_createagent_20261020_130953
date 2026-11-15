@@ -1,0 +1,115 @@
+"""Provider 适配工厂：统一返回 langchain_core BaseChatModel。
+
+支持 OpenAI / Anthropic / Gemini / Qwen(本地 Ollama)。
+统一用 LangChain 的消息 Schema（SystemMessage/HumanMessage/AIMessage/ToolMessage），
+Provider 差异被各自的 ChatModel 实现屏蔽。
+"""
+from __future__ import annotations
+
+from functools import lru_cache
+
+from langchain_core.language_models import BaseChatModel
+
+from app.config import get_settings
+
+
+def _build_model(provider: str, model: str) -> BaseChatModel:
+    s = get_settings()
+    if provider == "openai":
+        from langchain_openai import ChatOpenAI
+        kwargs = {"model": model, "temperature": s.llm_temperature}
+        if s.openai_api_key:
+            kwargs["api_key"] = s.openai_api_key
+        if s.openai_base_url:
+            kwargs["base_url"] = s.openai_base_url
+        return ChatOpenAI(**kwargs)
+
+    if provider == "anthropic":
+        from langchain_anthropic import ChatAnthropic
+        return ChatAnthropic(
+            model=model, temperature=s.llm_temperature,
+            api_key=s.anthropic_api_key or None,
+        )
+
+    if provider == "gemini":
+        from langchain_google_genai import ChatGoogleGenerativeAI
+        return ChatGoogleGenerativeAI(
+            model=model, temperature=s.llm_temperature,
+            google_api_key=s.google_api_key or None,
+        )
+
+    if provider == "qwen":
+        from langchain_ollama import ChatOllama
+        return ChatOllama(
+            model=model, temperature=s.llm_temperature,
+            base_url=s.ollama_base_url,
+        )
+
+    raise ValueError(f"不支持的 provider: {provider}，可选 openai/anthropic/gemini/qwen")
+
+
+@lru_cache
+def get_chat_model(provider: str | None = None, model: str | None = None) -> BaseChatModel:
+    """返回原始 BaseChatModel。
+
+    注意：需要 bind_tools / with_structured_output / create_react_agent 时
+    必须用原始模型，不能包 RunnableBinding。重试交由 Provider SDK 自带的重试
+    （OpenAI/Anthropic 默认重试），错误分类见 app.llm.retry.classify_error。
+    """
+    s = get_settings()
+    name = provider or s.llm_provider
+    model_name = model or s.llm_model
+    return _build_model(name, model_name)
+
+
+@lru_cache
+def get_structured_model(provider: str | None = None, model: str | None = None) -> BaseChatModel:
+    """用于 `with_structured_output()` 的模型实例。
+
+    ## 为什么需要单独一个
+
+    DeepSeek 官方 API 的**思考模式与 `tool_choice="required"` 互斥**。
+    而 `with_structured_output(method="function_calling")` 内部正是用
+    强制 tool_choice 来约束输出的，于是在思考模式下直接返回：
+
+        400 'Thinking mode does not support this tool_choice'
+
+    实测后果非常严重：意图识别是 Agent 链路的第一步，它一失败，
+    **75 条评测用例 100% 全崩**（全部 `intent=-`），且错误信息看起来
+    像是"模型不支持工具调用"，很容易误判为模型选型问题。
+
+    ## 为什么只在这一路关闭思考
+
+    主 Agent 走的是 `create_react_agent` → `bind_tools`（**不带** tool_choice），
+    与思考模式**完全兼容**，因此保留思考能力，不影响推理质量。
+    只有结构化输出这三处（意图识别 / 画像抽取 / 查询改写）需要关掉思考。
+
+    ## 其他方案为什么不用
+
+    * `method="json_schema"` —— DeepSeek 返回 "This response_format type is unavailable now"
+    * `method="json_mode"`   —— 能跑但**约束失效**：实测把 intent 返回成
+      `job_recommendation`、甚至整句中文，枚举校验形同虚设
+    """
+    s = get_settings()
+    name = provider or s.llm_provider
+    model_name = model or s.llm_model
+
+    if name != "openai":
+        # 其他 provider 未观察到该限制，保持原样
+        return _build_model(name, model_name)
+
+    from langchain_openai import ChatOpenAI
+
+    kwargs: dict = {"model": model_name, "temperature": s.llm_temperature}
+    if s.openai_api_key:
+        kwargs["api_key"] = s.openai_api_key
+    if s.openai_base_url:
+        kwargs["base_url"] = s.openai_base_url
+
+    # 仅对 DeepSeek 端点下发 thinking 开关：其他 OpenAI 兼容端点
+    # （如 OpenAI 本身）不认识该参数，传了会被拒。
+    base = (s.openai_base_url or "").lower()
+    if "deepseek" in base:
+        kwargs["extra_body"] = {"thinking": {"type": "disabled"}}
+
+    return ChatOpenAI(**kwargs)

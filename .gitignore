@@ -1,0 +1,56 @@
+# ── 密钥与本地配置（绝不提交）──
+.env
+**/.env
+*.key
+*.pem
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# ── Java / Maven ──
+target/
+*.jar
+*.class
+*.iml
+
+# ── 前端 ──
+node_modules/
+dist/
+.vite/
+
+# ── 运行日志与产物 ──
+logs/
+*.log
+dump.rdb
+*.pid
+
+# ── 向量索引与大文件（不进 Git）──
+job-agent/data/faiss/
+*.faiss
+*.pkl
+*.pt
+*.onnx
+
+# ── 评测产物与坏案例 ──
+**/benchmark/reports/
+**/reports/
+bad_cases/
+
+# ── 本地备份目录 ──
+*_backup_*/
+job-agent_backup_*/
+
+# ── 编辑器 ──
+.idea/
+.vscode/
+
+# ── 个人材料（不公开）──
+面试材料/
+
+# 本地真实配置（含密钥，绝不提交）
+job-platform/job-server/src/main/resources/application-dev.yml

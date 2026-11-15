@@ -1,0 +1,36 @@
+.page { padding-bottom: 20rpx; }
+.gold { color: #C9A45C; }
+.nav { background: #0B2E59; color: #fff; text-align: center; padding: 20rpx 24rpx; font-size: 34rpx; font-weight: 600; }
+.profile-card { background: #0B2E59; padding: 30rpx 24rpx; }
+.user-row { display: flex; align-items: center; gap: 20rpx; }
+.avatar { width: 100rpx; height: 100rpx; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 52rpx; }
+.user-name { color: #fff; font-size: 34rpx; font-weight: 600; display: block; }
+.login-hint { color: #C9A45C; font-size: 22rpx; margin-top: 6rpx; display: block; }
+.auth-btn { background: #C9A45C; color: #0B2E59; font-size: 24rpx; border: none; border-radius: 24rpx; padding: 0 24rpx; line-height: 1.6; margin-left: auto; }
+.user-badges { display: flex; gap: 10rpx; margin-top: 10rpx; }
+.vip-badge { background: #C9A45C; color: #0B2E59; font-size: 20rpx; border-radius: 14rpx; padding: 4rpx 14rpx; }
+.non-vip { border: 1rpx solid rgba(255,255,255,0.5); color: rgba(255,255,255,0.7); font-size: 20rpx; border-radius: 14rpx; padding: 4rpx 14rpx; }
+.rights { color: rgba(255,255,255,0.75); font-size: 22rpx; margin-top: 20rpx; display: block; }
+.welfare { margin: 20rpx; padding: 26rpx; display: flex; justify-content: space-between; align-items: center; }
+.welfare-title { font-weight: 700; font-size: 32rpx; display: block; }
+.welfare-sub { color: #999; font-size: 22rpx; margin-top: 6rpx; display: block; }
+.arrow { color: #C9A45C; font-size: 44rpx; }
+.progress-card { margin: 0 20rpx 20rpx; padding: 26rpx; }
+.progress-title { font-weight: 600; font-size: 30rpx; display: block; margin-bottom: 20rpx; }
+.timeline { display: flex; flex-direction: column; }
+.stage { display: flex; gap: 16rpx; }
+.stage-left { display: flex; flex-direction: column; align-items: center; width: 20rpx; }
+.stage-dot { width: 16rpx; height: 16rpx; border-radius: 50%; background: #ddd; }
+.stage-dot.current { background: #C9A45C; width: 20rpx; height: 20rpx; }
+.stage-line { flex: 1; width: 2rpx; background: #eee; min-height: 40rpx; }
+.stage-info { padding-bottom: 30rpx; }
+.stage-name { font-size: 28rpx; font-weight: 500; display: block; }
+.stage-name.current-text { color: #C9A45C; font-weight: 700; }
+.stage-time { color: #999; font-size: 22rpx; }
+.stage-detail { background: #F5F6FA; border-radius: 12rpx; padding: 24rpx; margin-top: 10rpx; }
+.detail-title { font-weight: 700; font-size: 28rpx; display: block; margin-bottom: 12rpx; }
+.detail-p { color: #666; font-size: 24rpx; line-height: 1.7; margin-bottom: 8rpx; display: block; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rpx; background: #eee; margin: 0 20rpx; }
+.grid-item { background: #fff; padding: 30rpx 0; display: flex; flex-direction: column; align-items: center; gap: 12rpx; }
+.grid-icon { font-size: 44rpx; }
+.grid-label { font-size: 24rpx; color: #333; }
